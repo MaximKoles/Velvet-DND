@@ -91,10 +91,6 @@
       background: #261b24 !important;
     }
 
-    .shield-badge {
-      clip-path: polygon(50% 0%, 100% 12%, 100% 75%, 50% 100%, 0% 75%, 0% 12%);
-    }
-
     @keyframes pulse-rage-button {
       0% {
         box-shadow: 0 0 8px rgba(239, 68, 68, 0.6), inset 0 0 6px rgba(239, 68, 68, 0.4);
@@ -229,12 +225,8 @@
     }
 
     .feature-card {
-      cursor: grab;
       transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
       position: relative;
-    }
-    .feature-card:active {
-      cursor: grabbing;
     }
     .feature-card.is-dragging {
       opacity: 0.35;
@@ -337,7 +329,7 @@
       </div>
     </div>
 
-    <!-- Кнопка ЯРОСТЬ Варвара (Оптимизирована под ландшафт) -->
+    <!-- Кнопка ЯРОСТЬ Варвара (D&D 2024) -->
     <button id="main-rage-btn" 
             onclick="toggleMainRage()" 
             class="px-3 py-1 rounded-lg border border-red-950 bg-gradient-to-r from-[#20151c] to-[#2b1720] hover:border-red-600/70 text-red-400 hover:text-red-200 font-extrabold uppercase text-xs flex items-center gap-1.5 shadow transition cursor-pointer"
@@ -379,12 +371,11 @@
         </div>
       </div>
 
-      <!-- Служебные кнопки в компактном виде -->
+      <!-- Служебные кнопки -->
       <button id="wakelock-btn" onclick="toggleWakeLock()" title="Экран всегда включен" class="w-6 h-6 rounded-md bg-[#1e2436] border border-[#333d59] hover:bg-[#28314a] text-slate-400 hover:text-amber-300 transition flex items-center justify-center text-[11px]">
         <span id="wakelock-icon">💡</span>
       </button>
 
-      <!-- Кнопка перехода в полноэкранный режим -->
       <button id="fullscreen-btn" onclick="toggleFullscreen()" title="На весь экран" class="w-6 h-6 rounded-md bg-[#1e2436] border border-[#333d59] hover:bg-[#28314a] text-slate-400 hover:text-sky-300 transition flex items-center justify-center text-[11px]">
         <span id="fullscreen-icon">⛶</span>
       </button>
@@ -403,10 +394,16 @@
   <div id="dying-banner" class="hidden w-full bg-red-950/90 border border-red-600 rounded-xl px-3 py-1.5 mb-2 shadow-xl flex items-center justify-between gap-2 animate-pulse text-xs">
     <div class="flex items-center gap-2">
       <span class="text-lg">☠️</span>
-      <span class="font-extrabold text-white uppercase tracking-wider">0 ХИТОВ (ПРИ СМЕРТИ)</span>
-      <span class="text-[11px] text-red-200 hidden sm:inline">— 10+ успех, 9- провал. Нат 20 = подъем!</span>
+      <div>
+        <span class="font-extrabold text-white uppercase tracking-wider">0 ХИТОВ (ПРИ СМЕРТИ)</span>
+        <span id="stabilized-badge" class="hidden ml-2 px-1.5 py-0.2 bg-emerald-800 text-emerald-200 text-[10px] rounded font-bold uppercase border border-emerald-500/50">СТАБИЛИЗИРОВАН</span>
+        <span class="text-[11px] text-red-200 hidden sm:inline ml-1">— 10+ успех, 9- провал. Нат 20 = 1 HP!</span>
+      </div>
     </div>
     <div class="flex items-center gap-1.5">
+      <button onclick="toggleStabilizedStatus()" id="stabilize-btn" class="px-2.5 py-1 bg-[#1e273a] hover:bg-[#2a3752] text-emerald-300 font-bold rounded-lg border border-emerald-500/40 transition">
+        Стабилизировать
+      </button>
       <button onclick="rollDeathSave()" class="px-2.5 py-1 bg-red-800 hover:bg-red-700 text-white font-bold rounded-lg border border-red-400 transition">
         Спасбросок d20
       </button>
@@ -446,7 +443,7 @@
         </button>
       </div>
 
-      <!-- Шпаргалка броска за столом: без лишнего английского дубляжа -->
+      <!-- Баффы и преимущества -->
       <div class="flex items-center gap-1.5 flex-wrap">
         <span class="text-[10px] font-extrabold uppercase tracking-wider text-amber-400 flex items-center gap-1">
           <span>🎲</span> Баффы:
@@ -830,7 +827,7 @@
           <span class="text-[8px] text-[#8e9bb0] uppercase font-bold tracking-tight mt-0.5">ВДОХНОВЕНИЕ</span>
         </div>
 
-        <!-- Истощение -->
+        <!-- Истощение (D&D 2024: 1-6) -->
         <div onclick="cycleExhaustion()" class="col-span-1 sm:col-span-1 bg-[#171b29] border border-[#2b334a] rounded-xl p-1.5 flex flex-col items-center justify-center cursor-pointer hover:border-red-400 transition" title="Уровень истощения">
           <span class="text-lg font-black text-white" id="exhaustion-val">0</span>
           <span class="text-[8px] text-[#8e9bb0] uppercase font-bold tracking-tight">ИСТОЩ</span>
@@ -876,7 +873,7 @@
             </button>
           </div>
 
-          <!-- Две колонки способностей, идеально адаптированные под ландшафт планшета -->
+          <!-- Две колонки способностей -->
           <div id="features-columns-wrapper" class="flex flex-col md:flex-row gap-2 items-start flex-grow overflow-y-auto max-h-[520px] pr-0.5">
             <div id="features-col-0" 
                  class="features-column-dropzone w-full md:w-1/2 flex flex-col gap-2 p-1 rounded-xl border border-dashed border-[#242c3f]"
@@ -944,7 +941,7 @@
           </div>
           <textarea id="inventory-text" oninput="saveInventoryTextAuto()" class="w-full h-64 bg-[#121622] border border-[#262f44] rounded-lg p-2.5 text-xs text-[#e2e8f0] focus:outline-none focus:border-sky-400 leading-relaxed resize-y" placeholder="Записывайте сюда снаряжение, лут, зелья..."></textarea>
           <div class="flex justify-between items-center">
-            <span class="text-[10px] text-[#64748b]">Автоматически сохраняется</span>
+            <span class="text-[10px] text-[#64748b]">Автоматически сохраняется в персонажа</span>
             <button onclick="saveInventoryTextManual()" class="px-2.5 py-1 bg-sky-600 hover:bg-sky-500 text-white rounded text-xs font-semibold shadow">Сохранить</button>
           </div>
         </div>
@@ -996,9 +993,9 @@
 
         <!-- TAB 6: ЗАМЕТКИ -->
         <div id="tab-notes" class="tab-pane hidden flex-col gap-2">
-          <textarea id="player-notes" class="w-full h-56 bg-[#121622] border border-[#262f44] rounded-lg p-2.5 text-xs text-[#e2e8f0] focus:outline-none focus:border-sky-400" placeholder="Боевые и сюжетные заметки..."></textarea>
+          <textarea id="player-notes" oninput="saveNotesAuto()" class="w-full h-56 bg-[#121622] border border-[#262f44] rounded-lg p-2.5 text-xs text-[#e2e8f0] focus:outline-none focus:border-sky-400 leading-relaxed" placeholder="Боевые и сюжетные заметки..."></textarea>
           <div class="flex justify-between items-center">
-            <span class="text-[10px] text-[#64748b]">Автосохранение</span>
+            <span class="text-[10px] text-[#64748b]">Автосохранение в данные персонажа</span>
             <button onclick="saveNotesManual()" class="px-2.5 py-1 bg-sky-600 hover:bg-sky-500 text-white rounded text-xs font-semibold shadow">Сохранить</button>
           </div>
         </div>
@@ -1054,7 +1051,7 @@
     </div>
   </div>
 
-  <!-- Здоровье HP -->
+  <!-- Здоровье HP: Прямой инпут Максимума и исправление сохранения -->
   <div id="hp-modal" class="fixed inset-0 bg-black/75 backdrop-blur-xs hidden z-50 flex items-center justify-center p-3">
     <div class="bg-[#171b29] border border-[#3b4b73] rounded-2xl w-full max-w-sm p-4 shadow-2xl">
       <div class="flex justify-between items-center mb-2.5">
@@ -1075,13 +1072,18 @@
         </div>
         <div>
           <div class="text-[9px] text-[#8e9bb0] uppercase font-bold">Максимум</div>
-          <button onclick="editMaxHpPrompt()" class="text-xl font-black text-white hover:text-sky-300 mt-0.5" id="modal-hp-max">45</button>
+          <div class="flex items-center justify-center mt-0.5">
+            <input id="modal-hp-max-input" type="number" min="1" max="999" value="45" 
+                   onchange="handleDirectMaxHpChange(this.value)"
+                   class="w-16 bg-[#1a2133] border border-[#3b4b73] text-white font-black text-center rounded text-base py-0.5 focus:outline-none focus:border-sky-400">
+          </div>
         </div>
       </div>
 
       <div class="flex items-center gap-1.5 mb-2.5">
         <input id="hp-input-val" type="number" min="1" max="200" value="5" class="w-16 bg-[#121622] border border-[#394566] text-white font-bold text-center rounded-lg py-1.5 text-xs focus:outline-none focus:border-sky-400">
-        <button onclick="applyDamage()" class="flex-1 py-1.5 bg-red-700 hover:bg-red-600 text-white font-bold text-xs rounded-lg transition shadow">- Урон</button>
+        <button onclick="applyDamage(false)" class="flex-1 py-1.5 bg-red-700 hover:bg-red-600 text-white font-bold text-xs rounded-lg transition shadow">- Урон</button>
+        <button onclick="applyDamage(true)" class="px-2 py-1.5 bg-red-900 hover:bg-red-800 text-red-200 font-bold text-[11px] rounded-lg transition border border-red-500/40" title="Критический урон в упор (2 провала на 0 HP)">- Крит</button>
         <button onclick="applyHeal()" class="flex-1 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs rounded-lg transition shadow">+ Лечение</button>
       </div>
 
@@ -1131,7 +1133,7 @@
         <button onclick="closeRestModal()" class="text-[#64748b] hover:text-white">✕</button>
       </div>
       <p class="text-xs text-[#8e9bb0] mb-2.5">
-        Кости хитов варвара: <strong><span id="hitdice-remaining">4</span>d12</strong> доступно.
+        Кости хитов варвара: <strong><span id="hitdice-remaining">4</span>d12</strong> доступно (из <span id="hitdice-max">4</span>).
       </p>
       <div class="bg-[#121622] p-2.5 rounded-xl border border-[#2b334a] text-center mb-3">
         <div class="text-[11px] text-[#94a3b8]">Текущее здоровье:</div>
@@ -1141,7 +1143,7 @@
         Бросить 1d12 + Телосложение
       </button>
       <button onclick="resetRacialShortRest()" class="w-full py-1.5 bg-[#20273c] hover:bg-[#2c3752] text-emerald-300 font-bold text-xs rounded-lg border border-emerald-500/30">
-        Восстановить способность «Вызов корней»
+        Восстановить способности короткого отдыха
       </button>
     </div>
   </div>
@@ -1153,7 +1155,7 @@
         <div class="w-8 h-8 rounded-lg bg-sky-950/70 border border-sky-500/40 flex items-center justify-center text-lg shrink-0">🌙</div>
         <div>
           <h3 class="text-sm font-bold text-white">Длительный отдых</h3>
-          <p class="text-[10px] text-[#8e9bb0]">8 часов отдыха</p>
+          <p class="text-[10px] text-[#8e9bb0]">8 часов отдыха (D&D 2024)</p>
         </div>
       </div>
       
@@ -1190,7 +1192,6 @@
             <select id="weapon-stat-input" class="w-full bg-[#121622] border border-[#2b334a] rounded px-2 py-1.5 text-white focus:outline-none focus:border-sky-400">
               <option value="str">Сила (Авторасчет)</option>
               <option value="dex">Ловкость (Авторасчет)</option>
-              <option value="custom">Ручной ввод</option>
             </select>
           </div>
           <div>
@@ -1330,8 +1331,7 @@
 
         <div>
           <label class="block text-[#8e9bb0] font-bold mb-0.5">Полное описание (D&D 2024):</label>
-          <textarea id="feature-full-input" rows="3" class="w-full bg-[#121622] border border-[#2b334a] rounded px-2.5 py-1.5 text-white focus:outline-none focus:border-sky-400 leading-relaxed" style="
-    height: 300px;">></textarea>
+          <textarea id="feature-full-input" rows="3" class="w-full bg-[#121622] border border-[#2b334a] rounded px-2.5 py-1.5 text-white focus:outline-none focus:border-sky-400 leading-relaxed"></textarea>
         </div>
       </div>
 
@@ -1409,7 +1409,7 @@
         <div class="bg-[#121622] p-2.5 rounded-xl border border-[#262f44]">
           <h4 class="text-white font-bold mb-1">Файл сохранения (.json)</h4>
           <p class="text-[11px] text-[#8e9bb0] mb-2 leading-relaxed">
-            Выгрузите файл персонажа для резервной копии или загрузите ранее сохраненный.
+            Выгрузите полный файл персонажа (включая заметки, снаряжение и кошелек) для резервной копии.
           </p>
           <div class="grid grid-cols-2 gap-2 mt-2">
             <button onclick="exportCharacterFile()" class="py-1.5 px-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs rounded-lg transition text-center shadow">
@@ -1487,7 +1487,7 @@
     </div>
   </div>
 
-  <!-- Модальное окно кошелька -->
+  <!-- Модальное окно кошелька (целочисленное хранение gp, sp, cp) -->
   <div id="currency-modal" class="fixed inset-0 bg-black/75 backdrop-blur-xs hidden z-50 flex items-center justify-center p-3">
     <div class="bg-[#171b29] border border-amber-500/40 rounded-2xl w-full max-w-sm p-4 shadow-2xl">
       <div class="flex justify-between items-center mb-2">
@@ -1526,7 +1526,7 @@
           </div>
         </div>
         <div class="text-[10px] text-center text-[#94a3b8] bg-[#121622] py-1 px-2 rounded-lg border border-[#242c3f]">
-          Предпросмотр: <strong id="curr-modal-calc-preview" class="text-amber-300">0.37 зм</strong>
+          Предпросмотр ввода: <strong id="curr-modal-calc-preview" class="text-amber-300">0.37 зм</strong>
         </div>
       </div>
 
@@ -1555,7 +1555,7 @@
     /* =========================================================
        D&D 2024 COMPLETE STATE & CONFIG
        ========================================================= */
-    const STORAGE_KEY = 'velvet_dnd2024_sheet_v5';
+    const STORAGE_KEY = 'velvet_dnd2024_sheet_v6';
 
     const MASTERY_RULES = {
       "Cleave": {
@@ -1564,7 +1564,7 @@
       },
       "Topple": {
         name: "Topple (Опрокидывание)",
-        desc: "При попадании цель совершает спасбросок Телосложения (Сл 8 + Владение + СИЛ) или сбивается с ног (Prone)."
+        desc: "При попадании цель совершает спасбросок Телосложения (Сл = 8 + Владение + модификатор характеристики оружия) или сбивается с ног (Prone)."
       },
       "Push": {
         name: "Push (Толчок 10 фт)",
@@ -1607,7 +1607,8 @@
       tempHp: 0,
       hitDiceRemaining: 4,
       maxHitDice: 4,
-      gold: 0.37,
+      isStabilized: false,
+      coins: { gp: 0, sp: 3, cp: 7 },
       inspiration: false,
       exhaustion: 0,
       isRaging: false,
@@ -1656,7 +1657,7 @@
           title: "ЯРОСТЬ",
           category: "",
           shortDesc: "Бонус урона, преимущество на проверки Силы, сопротивление урону",
-          fullDesc: "🔥 Ярость (3) бонусным действием, если вы не носите тяжёлый доспех.\nЭффекты: \nСопротивление к урону (дроб, кол, руб)\nУрон ярости +2 \nПреимущество на проверки и спасброски Силы.\nМожете поддерживать ярость до 10 минут.\n\nПродлевается, если вы наносите урон, атакуете или тратите бонусное действие. Нельзя концентрироваться на заклинаниях.",
+          fullDesc: "🔥 Ярость (3) бонусным действием, если вы не носите тяжёлый доспех.\nЭффекты:\nСопротивление к урону (дроб, кол, руб)\nУрон ярости +2\nПреимущество на проверки и спасброски Силы.\nМожете поддерживать ярость до 10 минут.\n\nПродлевается, если вы наносите урон, атакуете или тратите бонусное действие. Нельзя концентрироваться на заклинаниях.",
           resetType: "long",
           maxCharges: 3,
           curCharges: 3,
@@ -1711,7 +1712,7 @@
           maxCharges: 1,
           curCharges: 1,
           shortDesc: "Реакцией стабилизирует союзника + 1d4 хитов, грубо вправляя кость.",
-          fullDesc: "💀 Черта: «Метод Грубой Медицины»\n(1/день, реакция)\n\nРоль\nКогда союзник рядом получает серьёзный урон.\n\nЭффект\nБафф:\nВельвет может немедленно стабилизировать союзника или дать ему 1d4 хитов, грубо вправляя кость или сустав.\n\nДебафф:\nПроцедура болезненная — союзник получает помеху на свою следующую атаку или проверку Ловкости.\n\nФраза«Будет больно. Значит работает.»",
+          fullDesc: "💀 Черта: «Метод Грубой Медицины»\n(1/день, реакция)\n\nБафф: Вельвет может стабилизировать союзника или дать 1d4 хитов.\nДебафф: Союзник получает помеху на свою следующую атаку или проверку Ловкости.\nФраза: «Будет больно. Значит работает.»",
           themeColor: "auto"
         },
         {
@@ -1736,8 +1737,8 @@
           resetType: "none",
           maxCharges: 0,
           curCharges: 0,
-          shortDesc: "Спасброски Ловкости с преимуществом от эффектов, которые вы можете видеть, такие как заклинания и ловушки.",
-          fullDesc: "вы получаете обострённое ощущение происходящего вокруг, помогающее вам избегать опасности. \n\nВы совершаете с преимуществом спасброски Ловкости от эффектов, которые вы можете видеть, такие как заклинания и ловушки. \n\nДля использования этого преимущества вы не должны быть ослеплены, оглушены и не должны быть недееспособны.",
+          shortDesc: "Спасброски Ловкости с преимуществом от видимых эффектов и ловушек.",
+          fullDesc: "Вы совершаете с преимуществом спасброски Ловкости от эффектов, которые вы можете видеть (заклинания, ловушки). Не работает, если вы ослеплены, оглушены или недееспособны.",
           themeColor: "crimson"
         },
         {
@@ -1746,8 +1747,8 @@
           icon: "🌵",
           title: "Вызов корней",
           category: "",
-          shortDesc: "Сл 12. Концентрация до 1 мин. Опутывает врагов лианами.",
-          fullDesc: "Раз в короткий отдых ты можешь вызвать из земли лианы, мох или корни, чтобы задержать врагов (Опутывание (Entangle), Сл = 8 + модификатор Мудрости + бонус мастерства).\n\nТребует концентрации! При активации Ярости концентрация спадает.",
+          shortDesc: "Сл = 8 + Мудрость + Владение. Опутывает врагов лианами.",
+          fullDesc: "Раз в короткий отдых ты можешь вызвать из земли лианы (Entangle, Сл = 8 + WIS + Влад). Требует концентрации! При активации Ярости концентрация спадает.",
           resetType: "short",
           maxCharges: 1,
           curCharges: 1,
@@ -1761,7 +1762,7 @@
           title: "Симбиоз с древом",
           category: "",
           shortDesc: "Восстановление 1к6 хитов действием у ствола или корня дерева",
-          fullDesc: "Если ты находишься рядом с деревом или корневой системой, ты можешь восстановить 1к6 хитов как действие, прижавшись к стволу (1 раз за длительный отдых).",
+          fullDesc: "Рядом с деревом можно восстановить 1к6 хитов как действие (1 раз за длительный отдых).",
           resetType: "long",
           maxCharges: 1,
           curCharges: 1,
@@ -1776,8 +1777,8 @@
           resetType: "long",
           maxCharges: 2,
           curCharges: 2,
-          shortDesc: "Цель совершает спасбросок Телосложения (Сл 13). Провал: «выбивает сустав». Успех: + 1d6 дроб.урона",
-          fullDesc: "(Боевой, 2/день, бонусное действие)\n\nОписание\nВельвет видит тело как механизм. В бою он бьёт не куда попало — он знает, где сустав, где сухожилие, где кость тоньше. Но когда ярость берёт верх, он действует как хирург без анестезии.\n\nМеханика\nБонусным действием Вельвет активирует «Костоправство» до конца своего хода.Следующая атака оружием или рогами получает особый эффект:\nЦель совершает спасбросок Телосложения (Сл = 8 + Проф + Сила).\n\nПровал: Вельвет «выбивает сустав». Цель выбирает один эффект:скорость уменьшается на 10 футов на 2 раунда помеха на следующую атаку теряет реакцию до конца раунда\n\nУспех: цель получает дополнительный 1d6 дробящего урона.\n\nФраза«Не переживай… я знаю, где у тебя эта кость.»",
+          shortDesc: "Спасбросок CON (Сл 8 + Проф + СИЛ). Провал: «выбивает сустав». Успех: + 1d6 дроб.урона",
+          fullDesc: "Бонусным действием активирует «Костоправство». Следующая атака требует спасброска CON. При провале: уменьшение скорости на 10 фт на 2 раунда, помеха на атаку или потеря реакции.",
           themeColor: "azure"
         },
         {
@@ -1789,8 +1790,8 @@
           resetType: "long",
           maxCharges: 2,
           curCharges: 2,
-          shortDesc: "После 30 сек наблюдения - проводит «диагноз». Мастер раскрывает инфу +1d4 к броску или проверке",
-          fullDesc: "🗣 Навык 2: «Спокойный Диагноз»\n(Социальный / исследовательский, 2/день, действие вне боя)\n\nОписание\nКогда Вельвет спокоен, в нём просыпается учёный. Он наблюдает за дыханием, походкой, напряжением мышц. Для него люди — открытая книга анатомии и поведения.\n\nМеханика\nВыберите существо, которое Вельвет наблюдает хотя бы 30 секунд.Он может провести «диагноз». \n\nМастер раскрывает одну из следующих вещей: физическую слабость цели, эмоциональное состояние, скрытую травму или болезнь, привычку или поведенческий шаблон. \n\nДополнительно: следующий бросок атаки или проверки против этой цели получает +1d4. \n\nФраза«Интересно… у тебя левое плечо слабее.»",
+          shortDesc: "После 30 сек наблюдения - «диагноз». Мастер раскрывает инфу + 1d4 к следующему броску",
+          fullDesc: "Наблюдение 30 секунд раскрывает слабость цели или состояние. Следующий бросок атаки или проверки против цели получает +1d4.",
           themeColor: "azure"
         },
         {
@@ -1802,22 +1803,9 @@
           resetType: "none",
           maxCharges: 0,
           curCharges: 0,
-          shortDesc: "Нося это кольцо, вы можете стоять на жидких поверхностях и ходить по ним, как если бы они были твёрдыми.",
+          shortDesc: "Позволяет стоять и ходить по жидким поверхностям.",
           fullDesc: "Нося это кольцо, вы можете стоять на жидких поверхностях и ходить по ним, как если бы они были твёрдыми.",
           themeColor: "purple"
-        },
-        {
-          id: "feat_living_body",
-          column: 1,
-          icon: "🌻",
-          title: "Живое тело (Фотосинтез)",
-          category: "",
-          shortDesc: "Питание солнечным светом и водой",
-          fullDesc: "Ты можешь употреблять воду и солнечный свет, как пищу, получая половину суточного восстановления.",
-          resetType: "none",
-          maxCharges: 0,
-          curCharges: 0,
-          themeColor: "auto"
         },
         {
           id: "feat_unarmored_defense",
@@ -1839,19 +1827,12 @@
           title: "Мастерство оружия",
           category: "Класс (Варвар)",
           shortDesc: "Доступны тактические приемы выбранного освоенного оружия.",
-          fullDesc: "Вам доступны особые свойства оружия: Cleave, Topple, Nick и др. Сл спасбросков свойств = 8 + Владение + модификатор Силы.",
+          fullDesc: "Вам доступны особые свойства оружия: Cleave, Topple, Nick и др. Сл спасбросков свойств = 8 + Владение + модификатор характеристики оружия.",
           resetType: "none",
           maxCharges: 0,
           curCharges: 0,
           themeColor: "slate"
         }
-      ],
-      inventory: [
-        { id: 'i1', name: "Секира (двуручное, тяжелое)", weight: "7 фнт" },
-        { id: 'i2', name: "Короткий меч (фехтовальное, легкое)", weight: "2 фнт" },
-        { id: 'i3', name: "Кувалда (универсальное)", weight: "10 фнт" },
-        { id: 'i4', name: "Набор путешественника", weight: "в рюкзаке" },
-        { id: 'i5', name: "Стеклянный флакон с болотной водой", weight: "реликвия" }
       ],
       goals: [
         { id: 'g1', text: "Найти источник осквернения чащи", done: true },
@@ -1859,7 +1840,7 @@
         { id: 'g3', text: "Отомстить лесорубам Железного Клана", done: false }
       ],
       bio: {
-        traits: "Они говорят на Тай’Ла-Морх — языке зелени и соков. Он не имеет слов — только дыхания, шелеста, движений рогов и стуков копыт. Они также ощущают эмоции деревьев, и могут читать их «память» через ритуальные сны.",
+        traits: "Я говорю тихо, как шелест листвы перед бурей, но в гневе крушу все вокруг.",
         ideals: "Природа не знает жалости, только священный баланс.",
         bonds: "Мой древний росток чащи, который я храню у самого сердца.",
         flaws: "Огонь и искры вызывают у меня неподдельный первобытный трепет."
@@ -1869,6 +1850,7 @@
       weaponProficiencies: ["Простое оружие", "Воинское оружие"],
       toolsProficiencies: ["Травничество"],
       conditions: [],
+      notes: "",
       inventoryText: `Фамильное зеркальце
 
 Набор путешественника
@@ -1899,8 +1881,6 @@
 Колчан 15 стрел
 Костяное копье 2 шт 1к6 (дист 30)`
     };
-
-    const defaultInventoryText = defaultCharacter.inventoryText;
 
     let Character = JSON.parse(JSON.stringify(defaultCharacter));
     let lastRollContext = null;
@@ -1947,17 +1927,37 @@
         try {
           const parsed = JSON.parse(saved);
           Character = Object.assign({}, defaultCharacter, parsed);
-          if (parsed.languages !== undefined) {
-            Character.languages = parsed.languages;
+
+          // Обеспечиваем целостность структуры кошелька
+          if (!Character.coins) {
+            const legacyGold = typeof parsed.gold === 'number' ? parsed.gold : 0.37;
+            const totalCp = Math.round(legacyGold * 100);
+            Character.coins = {
+              gp: Math.floor(totalCp / 100),
+              sp: Math.floor((totalCp % 100) / 10),
+              cp: totalCp % 10
+            };
           }
+
+          // Миграция заметок и инвентаря в единый объект
+          const oldNotes = localStorage.getItem('velvet_notes_v4');
+          if (oldNotes && !Character.notes) Character.notes = oldNotes;
+
+          const oldInv = localStorage.getItem('velvet_inventory_text_v4');
+          if (oldInv && !Character.inventoryText) Character.inventoryText = oldInv;
+
+          // Гарантия корректных Hit Dice под уровень
+          if (!Character.maxHitDice || Character.maxHitDice !== Character.level) {
+            Character.maxHitDice = Character.level;
+            if (Character.hitDiceRemaining === undefined || Character.hitDiceRemaining > Character.maxHitDice) {
+              Character.hitDiceRemaining = Character.maxHitDice;
+            }
+          }
+
           if (Character.weapons) {
             Character.weapons.forEach(w => {
-              if (!w.baseDice && w.damage) {
-                w.baseDice = w.damage.split('+')[0];
-              }
-              if (!w.statKey) {
-                w.statKey = (w.name.includes("меч") || w.name.includes("лук")) ? "dex" : "str";
-              }
+              if (!w.baseDice && w.damage) w.baseDice = w.damage.split('+')[0];
+              if (!w.statKey) w.statKey = (w.name.includes("меч") || w.name.includes("лук")) ? "dex" : "str";
             });
           }
         } catch (e) {
@@ -1968,24 +1968,13 @@
       }
     }
 
-    /* Закрытие модальных окон при клике вне содержимого */
     function initBackdropClickDismiss() {
       const modalIds = [
-        'mastery-info-modal',
-        'dice-modal',
-        'hp-modal',
-        'rest-modal',
-        'long-rest-confirm-modal',
-        'weapon-modal',
-        'feature-modal',
-        'feature-delete-confirm-modal',
-        'conditions-modal',
-        'dicebag-modal',
-        'sheet-manager-modal',
-        'reset-confirm-modal',
-        'prompt-modal',
-        'languages-modal',
-        'currency-modal'
+        'mastery-info-modal', 'dice-modal', 'hp-modal', 'rest-modal',
+        'long-rest-confirm-modal', 'weapon-modal', 'feature-modal',
+        'feature-delete-confirm-modal', 'conditions-modal', 'dicebag-modal',
+        'sheet-manager-modal', 'reset-confirm-modal', 'prompt-modal',
+        'languages-modal', 'currency-modal'
       ];
 
       modalIds.forEach(id => {
@@ -2001,28 +1990,24 @@
       });
     }
 
-    /* Полноэкранный режим для iPad / Desktop */
     function toggleFullscreen() {
       const icon = document.getElementById('fullscreen-icon');
       const doc = document;
       const docEl = document.documentElement;
-
-      const isFullScreen = doc.fullscreenElement || doc.webkitFullscreenElement || doc.mozFullScreenElement || doc.msFullscreenElement;
+      const isFullScreen = doc.fullscreenElement || doc.webkitFullscreenElement;
 
       if (!isFullScreen) {
-        const req = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
+        const req = docEl.requestFullscreen || docEl.webkitRequestFullscreen;
         if (req) {
           req.call(docEl).then(() => {
             if (icon) icon.innerText = '🗗';
             showToast("Полноэкранный режим включен");
           }).catch(() => {
-            showToast("Нажмите «Поделиться» -> «На экран Домой» в Safari для полноэкранного вида PWA");
+            showToast("Нажмите «Поделиться» -> «На экран Домой» в Safari для PWA");
           });
-        } else {
-          showToast("Полноэкранный режим не поддерживается браузером");
         }
       } else {
-        const exit = doc.exitFullscreen || doc.webkitExitFullscreen || doc.mozCancelFullScreen || doc.msExitFullscreen;
+        const exit = doc.exitFullscreen || doc.webkitExitFullscreen;
         if (exit) {
           exit.call(doc).then(() => {
             if (icon) icon.innerText = '⛶';
@@ -2032,44 +2017,9 @@
       }
     }
 
-    document.addEventListener('fullscreenchange', handleFsStateChange);
-    document.addEventListener('webkitfullscreenchange', handleFsStateChange);
-
-    function handleFsStateChange() {
-      const icon = document.getElementById('fullscreen-icon');
-      const isFullScreen = document.fullscreenElement || document.webkitFullscreenElement;
-      if (icon) {
-        icon.innerText = isFullScreen ? '🗗' : '⛶';
-      }
-    }
-
-    function loadCharacterData() {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          Character = Object.assign({}, defaultCharacter, parsed);
-          if (parsed.languages !== undefined) {
-            Character.languages = parsed.languages;
-          }
-          if (Character.weapons) {
-            Character.weapons.forEach(w => {
-              if (!w.baseDice && w.damage) {
-                w.baseDice = w.damage.split('+')[0];
-              }
-              if (!w.statKey) {
-                w.statKey = (w.name.includes("меч") || w.name.includes("лук")) ? "dex" : "str";
-              }
-            });
-          }
-        } catch (e) {
-          Character = JSON.parse(JSON.stringify(defaultCharacter));
-        }
-      }
-    }
-
     function showToast(text) {
       const toast = document.getElementById('toast-msg');
+      if (!toast) return;
       toast.innerText = text;
       toast.classList.remove('translate-y-24', 'opacity-0');
       setTimeout(() => {
@@ -2083,8 +2033,15 @@
       return 2;
     }
 
-    function getWeaponMasteryDC() {
-      return 8 + Character.proficiencyBonus + Character.stats.str.mod;
+    function getTotalGoldValue() {
+      if (!Character.coins) return 0;
+      const { gp = 0, sp = 0, cp = 0 } = Character.coins;
+      return ((gp * 100) + (sp * 10) + cp) / 100;
+    }
+
+    function getWeaponMasteryDC(statKey = 'str') {
+      const statMod = Character.stats[statKey] ? Character.stats[statKey].mod : Character.stats.str.mod;
+      return 8 + Character.proficiencyBonus + statMod;
     }
 
     function formatMod(val) {
@@ -2116,6 +2073,7 @@
 
       Character.ac = 10 + Character.stats.dex.mod + Character.stats.con.mod;
 
+      // D&D 2024: истощение снижает скорость на 5 фт за уровень
       const exLevel = Character.exhaustion || 0;
       const currentSpeed = Math.max(0, (Character.baseSpeed || 30) - (exLevel * 5));
 
@@ -2169,15 +2127,19 @@
         }
       }
 
-      document.getElementById('passive-perception').innerText = 10 + getSkillModifier('perception');
-      document.getElementById('passive-insight').innerText = 10 + getSkillModifier('insight');
-      document.getElementById('passive-investigation').innerText = 10 + getSkillModifier('investigation');
+      // Пассивные чувства (с учетом истощения по правилам 2024: -2 за уровень истощения)
+      const exPenalty = exLevel * 2;
+      document.getElementById('passive-perception').innerText = Math.max(0, 10 + getSkillModifier('perception') - exPenalty);
+      document.getElementById('passive-insight').innerText = Math.max(0, 10 + getSkillModifier('insight') - exPenalty);
+      document.getElementById('passive-investigation').innerText = Math.max(0, 10 + getSkillModifier('investigation') - exPenalty);
 
       document.getElementById('val-ac').innerText = Character.ac;
       document.getElementById('val-speed').innerText = `${currentSpeed} фт`;
       document.getElementById('val-proficiency').innerText = formatMod(Character.proficiencyBonus);
-      document.getElementById('val-gold').innerText = Character.gold;
-      document.getElementById('inv-gold-display').innerText = `${Character.gold} ЗМ`;
+      
+      const totalGpStr = getTotalGoldValue().toFixed(2);
+      document.getElementById('val-gold').innerText = totalGpStr;
+      document.getElementById('inv-gold-display').innerText = `${totalGpStr} ЗМ`;
       document.getElementById('initiative-display').innerText = formatMod(Character.stats.dex.mod);
 
       updateRageButtonVisuals();
@@ -2237,8 +2199,8 @@
       const pct = Math.min(100, Math.floor((Character.exp / Character.maxExp) * 100));
       document.getElementById('exp-bar').style.width = pct + '%';
 
-      const notes = localStorage.getItem('velvet_notes_v4');
-      if (notes) document.getElementById('player-notes').value = notes;
+      const notesEl = document.getElementById('player-notes');
+      if (notesEl) notesEl.value = Character.notes || "";
     }
 
     function renderWeapons() {
@@ -2284,7 +2246,7 @@
                 ${w.stashed ? '<span class="text-[8px] text-amber-400 bg-amber-950/70 px-1 rounded">скрыто</span>' : ''}
               </div>
               ${w.mastery && w.mastery !== '—' 
-                ? `<button onclick="event.stopPropagation(); openMasteryInfoModal('${w.mastery}')" class="text-[8px] px-1 py-0.2 rounded bg-sky-950 text-sky-300 border border-sky-600/40 font-semibold hover:bg-sky-900 transition">${w.mastery} ℹ</button>` 
+                ? `<button onclick="event.stopPropagation(); openMasteryInfoModal('${w.mastery}', '${statKey}')" class="text-[8px] px-1 py-0.2 rounded bg-sky-950 text-sky-300 border border-sky-600/40 font-semibold hover:bg-sky-900 transition">${w.mastery} ℹ</button>` 
                 : ''}
             </div>
             <div class="w-3/12 flex justify-center">
@@ -2339,12 +2301,14 @@
       document.getElementById('weapon-modal').classList.add('hidden');
     }
 
-    function openMasteryInfoModal(masteryName) {
+    function openMasteryInfoModal(masteryName, statKey = 'str') {
       const data = MASTERY_RULES[masteryName];
       if (!data) return;
       document.getElementById('mastery-info-title').innerText = data.name;
       document.getElementById('mastery-info-desc').innerText = data.desc;
-      document.getElementById('mastery-info-dc').innerText = `Сл спасброска: ${getWeaponMasteryDC()} (8 + Владение + СИЛ)`;
+      const dc = getWeaponMasteryDC(statKey);
+      const statName = statKey === 'dex' ? 'ЛОВ' : 'СИЛ';
+      document.getElementById('mastery-info-dc').innerText = `Сл спасброска свойства: ${dc} (8 + Владение + ${statName})`;
       document.getElementById('mastery-info-modal').classList.remove('hidden');
     }
 
@@ -2476,9 +2440,7 @@
       let rageBonus = Character.isRaging ? getRageDamageBonus() : 0;
       
       let textDmg = `1d12${formatMod(baseDmg)}`;
-      if (rageBonus > 0) {
-        textDmg += ` + ${rageBonus}🔥`;
-      }
+      if (rageBonus > 0) textDmg += ` + ${rageBonus}🔥`;
 
       atkHint.innerText = textAtk;
       dmgHint.innerText = textDmg;
@@ -2529,9 +2491,6 @@
       }
     }
 
-    /* =========================================================
-       FEATURES ARSENAL (DRAG & DROP, CHARGES)
-       ========================================================= */
     let draggedFeatureId = null;
     let dropPosition = null;
 
@@ -2548,8 +2507,8 @@
       const col0Features = Character.features.filter(f => f.column === 0);
       const col1Features = Character.features.filter(f => f.column === 1);
 
-      col0Container.innerHTML = col0Features.map(f => createFeatureCardHtml(f)).join('');
-      col1Container.innerHTML = col1Features.map(f => createFeatureCardHtml(f)).join('');
+      col0Container.innerHTML = col0Features.map((f, i) => createFeatureCardHtml(f, 0, i, col0Features.length)).join('');
+      col1Container.innerHTML = col1Features.map((f, i) => createFeatureCardHtml(f, 1, i, col1Features.length)).join('');
 
       if (col0Features.length === 0) {
         col0Container.innerHTML = `<div class="text-center py-4 text-xs text-[#556484] italic pointer-events-none">Перетащите сюда</div>`;
@@ -2559,7 +2518,7 @@
       }
     }
 
-    function createFeatureCardHtml(f) {
+    function createFeatureCardHtml(f, colIdx, itemIdx, totalInCol) {
       let themeClass = 'feature-theme-passive';
       
       if (f.themeColor && f.themeColor !== 'auto') {
@@ -2632,8 +2591,16 @@
                 <h4 class="font-bold text-white text-xs leading-snug break-words group-hover:text-slate-100 transition" title="${f.title}">
                   ${f.title}
                 </h4>
-                <span class="text-[10px] text-[#64748b] group-hover:text-slate-300 opacity-60 shrink-0">✎</span>
+                
+                <!-- Touch-кнопки порядка для удобства на iPad -->
+                <div class="flex items-center gap-0.5 shrink-0 opacity-70 group-hover:opacity-100 transition" onclick="event.stopPropagation();">
+                  <button onclick="moveFeatureOrder('${f.id}', -1)" title="Вверх" class="w-4 h-4 rounded bg-[#1f283c] hover:bg-[#2f3d5c] text-[9px] flex items-center justify-center text-slate-300">▲</button>
+                  <button onclick="moveFeatureOrder('${f.id}', 1)" title="Вниз" class="w-4 h-4 rounded bg-[#1f283c] hover:bg-[#2f3d5c] text-[9px] flex items-center justify-center text-slate-300">▼</button>
+                  <button onclick="switchFeatureColumn('${f.id}')" title="Сменить колонку" class="w-4 h-4 rounded bg-[#1f283c] hover:bg-sky-600 text-[9px] flex items-center justify-center text-sky-300">⇄</button>
+                  <span class="text-[10px] text-[#64748b] ml-1">✎</span>
+                </div>
               </div>
+
               ${f.category && f.category.trim() ? `
               <div class="mb-1">
                 <span class="feat-badge text-[8px] px-1 py-0.2 rounded border font-semibold uppercase tracking-tight shrink-0">${f.category.trim()}</span>
@@ -2644,6 +2611,38 @@
           ${chargesHtml}
         </div>
       `;
+    }
+
+    function moveFeatureOrder(id, delta) {
+      const index = Character.features.findIndex(f => f.id === id);
+      if (index === -1) return;
+      const f = Character.features[index];
+      const col = f.column;
+
+      const sameColIndices = [];
+      Character.features.forEach((item, i) => {
+        if (item.column === col) sameColIndices.push(i);
+      });
+
+      const currentPosInCol = sameColIndices.indexOf(index);
+      const targetPosInCol = currentPosInCol + delta;
+
+      if (targetPosInCol >= 0 && targetPosInCol < sameColIndices.length) {
+        const targetGlobalIndex = sameColIndices[targetPosInCol];
+        const [moved] = Character.features.splice(index, 1);
+        Character.features.splice(targetGlobalIndex, 0, moved);
+        renderFeaturesArsenal();
+        saveCharacterData();
+      }
+    }
+
+    function switchFeatureColumn(id) {
+      const f = Character.features.find(x => x.id === id);
+      if (!f) return;
+      f.column = f.column === 0 ? 1 : 0;
+      renderFeaturesArsenal();
+      saveCharacterData();
+      showToast("Колонка переключена!");
     }
 
     function handleFeatureDragStart(e, id) {
@@ -2900,9 +2899,6 @@
       showToast("Способность удалена.");
     }
 
-    /* =========================================================
-       RAGE & CONCENTRATION INTERACTIONS
-       ========================================================= */
     function activateRageState() {
       Character.isRaging = true;
       const vitalityBonus = Character.level || 4;
@@ -2999,6 +2995,7 @@
       document.getElementById('rest-current-hp').innerText = Character.hp;
       document.getElementById('rest-max-hp').innerText = Character.maxHp;
       document.getElementById('hitdice-remaining').innerText = Character.hitDiceRemaining;
+      document.getElementById('hitdice-max').innerText = Character.maxHitDice;
       document.getElementById('rest-modal').classList.remove('hidden');
     }
     function closeRestModal() {
@@ -3049,7 +3046,13 @@
     function triggerLongRest() {
       Character.hp = Character.maxHp;
       Character.tempHp = 0;
-      Character.hitDiceRemaining = Math.min(Character.maxHitDice, Character.hitDiceRemaining + Math.max(1, Math.floor(Character.maxHitDice / 2)));
+      Character.isStabilized = false;
+      
+      // D&D 2024: Восстанавливается половина от максимума костей хитов (минимум 1)
+      const restoredDice = Math.max(1, Math.floor(Character.maxHitDice / 2));
+      Character.hitDiceRemaining = Math.min(Character.maxHitDice, Character.hitDiceRemaining + restoredDice);
+      
+      // Снижение истощения на 1 уровень
       Character.exhaustion = Math.max(0, Character.exhaustion - 1);
       Character.deathSaves = { s: 0, f: 0 };
       Character.isRaging = false;
@@ -3073,7 +3076,7 @@
       document.getElementById('exhaustion-val').innerText = Character.exhaustion;
       recalcStatsAndSkills();
       if (Character.exhaustion > 0) {
-        showToast(`Истощение ур. ${Character.exhaustion}: -${Character.exhaustion * 2} к D20`);
+        showToast(`Истощение ур. ${Character.exhaustion}: -${Character.exhaustion * 2} ко всем броскам D20`);
       } else {
         showToast("Истощение снято!");
       }
@@ -3139,7 +3142,7 @@
       lastRollContext = { type: 'attack', weaponName, bonus: attackBonus, baseDice, damageType, mastery, statKey, exhaustionPenalty };
 
       let formulaText = `1d20 (${d20}) + ${attackBonus}`;
-      if (exhaustionPenalty > 0) formulaText += ` - ${exhaustionPenalty}`;
+      if (exhaustionPenalty > 0) formulaText += ` - ${exhaustionPenalty} (Истощ.)`;
       formulaText += ` = ${total}`;
 
       let subtitle = weaponName;
@@ -3268,17 +3271,32 @@
     function openHpModal() {
       document.getElementById('modal-hp-current').innerText = Character.hp;
       document.getElementById('modal-hp-temp').innerText = Character.tempHp || 0;
-      document.getElementById('modal-hp-max').innerText = Character.maxHp;
+      document.getElementById('modal-hp-max-input').value = Character.maxHp;
       document.getElementById('hp-modal').classList.remove('hidden');
     }
+
     function closeHpModal() {
       document.getElementById('hp-modal').classList.add('hidden');
     }
 
-    function applyDamage() {
+    function handleDirectMaxHpChange(val) {
+      const num = parseInt(val);
+      if (!isNaN(num) && num > 0) {
+        Character.maxHp = num;
+        if (Character.hp > Character.maxHp) {
+          Character.hp = Character.maxHp;
+        }
+        updateHpDisplay();
+        saveCharacterData();
+        showToast(`Максимум HP сохранён: ${num}`);
+      }
+    }
+
+    function applyDamage(isCritical = false) {
       const val = parseInt(document.getElementById('hp-input-val').value) || 0;
       if (val <= 0) return;
 
+      Character.isStabilized = false;
       let rem = val;
       if (Character.tempHp > 0) {
         if (Character.tempHp >= rem) {
@@ -3292,9 +3310,11 @@
 
       if (rem > 0) {
         if (Character.hp === 0) {
-          Character.deathSaves.f = Math.min(3, Character.deathSaves.f + 1);
+          // D&D 2024: получение урона при 0 HP = 1 провал, крит = 2 провала
+          const failCount = isCritical ? 2 : 1;
+          Character.deathSaves.f = Math.min(3, Character.deathSaves.f + failCount);
           updateDeathSaveCheckboxes();
-          showToast("Урон на 0 HP: провал спасброска!");
+          showToast(`Урон на 0 HP: +${failCount} провал(а) спасброска!`);
         } else {
           Character.hp = Math.max(0, Character.hp - rem);
         }
@@ -3310,6 +3330,7 @@
       Character.hp = Math.min(Character.maxHp, Character.hp + val);
       if (Character.hp > 0) {
         Character.deathSaves = { s: 0, f: 0 };
+        Character.isStabilized = false;
         resetDeathSaveCheckboxes();
       }
       updateHpDisplay();
@@ -3327,20 +3348,17 @@
       Character.hp = Character.maxHp;
       Character.tempHp = 0;
       Character.deathSaves = { s: 0, f: 0 };
+      Character.isStabilized = false;
       resetDeathSaveCheckboxes();
       updateHpDisplay();
-      showToast("Здоровье восстановлено!");
+      showToast("Здоровье полностью восстановлено!");
     }
 
-    function editMaxHpPrompt() {
-      openPromptModal("Максимальные хиты", "Введите максимум HP:", Character.maxHp, (val) => {
-        const num = parseInt(val);
-        if (!isNaN(num) && num > 0) {
-          Character.maxHp = num;
-          updateHpDisplay();
-          showToast(`Максимум HP: ${num}`);
-        }
-      });
+    function toggleStabilizedStatus() {
+      if (Character.hp > 0) return;
+      Character.isStabilized = !Character.isStabilized;
+      updateHpDisplay();
+      showToast(Character.isStabilized ? "Персонаж стабилизирован!" : "Стабилизация снята.");
     }
 
     function updateHpDisplay() {
@@ -3348,7 +3366,11 @@
       document.getElementById('hp-max').innerText = Character.maxHp;
       document.getElementById('modal-hp-current').innerText = Character.hp;
       document.getElementById('modal-hp-temp').innerText = Character.tempHp || 0;
-      document.getElementById('modal-hp-max').innerText = Character.maxHp;
+      
+      const maxInput = document.getElementById('modal-hp-max-input');
+      if (maxInput && document.activeElement !== maxInput) {
+        maxInput.value = Character.maxHp;
+      }
 
       const tempBadge = document.getElementById('hp-temp-display');
       if (Character.tempHp > 0) {
@@ -3359,9 +3381,19 @@
       }
 
       const dyingBanner = document.getElementById('dying-banner');
+      const stabBadge = document.getElementById('stabilized-badge');
+      const stabBtn = document.getElementById('stabilize-btn');
+
       if (Character.hp === 0) {
         document.body.classList.add('is-dying-state');
         if (dyingBanner) dyingBanner.classList.remove('hidden');
+        if (stabBadge) {
+          if (Character.isStabilized) stabBadge.classList.remove('hidden');
+          else stabBadge.classList.add('hidden');
+        }
+        if (stabBtn) {
+          stabBtn.innerText = Character.isStabilized ? "Снять стабилизацию" : "Стабилизировать";
+        }
       } else {
         document.body.classList.remove('is-dying-state');
         if (dyingBanner) dyingBanner.classList.add('hidden');
@@ -3375,6 +3407,7 @@
       if (roll === 20) {
         Character.hp = 1;
         Character.deathSaves = { s: 0, f: 0 };
+        Character.isStabilized = false;
         resetDeathSaveCheckboxes();
         updateHpDisplay();
         showToast("🌟 Натуральная 20! Вел'Вет встает с 1 HP!");
@@ -3418,29 +3451,29 @@
     function renderInventory() {
       const invTextArea = document.getElementById('inventory-text');
       if (!invTextArea) return;
-      
-      const savedText = localStorage.getItem('velvet_inventory_text_v4');
-      if (savedText !== null) {
-        invTextArea.value = savedText;
-      } else if (Character.inventoryText) {
-        invTextArea.value = Character.inventoryText;
-      } else if (Array.isArray(Character.inventory) && Character.inventory.length > 0) {
-        invTextArea.value = Character.inventory.map(item => `${item.name}${item.weight ? ' — ' + item.weight : ''}`).join('\n');
-      } else {
-        invTextArea.value = defaultInventoryText;
-      }
+      invTextArea.value = Character.inventoryText || "";
     }
 
     function saveInventoryTextAuto() {
       const val = document.getElementById('inventory-text').value;
       Character.inventoryText = val;
-      localStorage.setItem('velvet_inventory_text_v4', val);
       saveCharacterData();
     }
 
     function saveInventoryTextManual() {
       saveInventoryTextAuto();
       showToast("Снаряжение сохранено!");
+    }
+
+    function saveNotesAuto() {
+      const val = document.getElementById('player-notes').value;
+      Character.notes = val;
+      saveCharacterData();
+    }
+
+    function saveNotesManual() {
+      saveNotesAuto();
+      showToast("Заметки сохранены!");
     }
 
     function renderGoals() {
@@ -3635,8 +3668,22 @@
           openPromptModal("Уровень", "Уровень персонажа (1-20):", Character.level, (lvl) => {
             const num = parseInt(lvl);
             if (!isNaN(num) && num > 0) {
+              const oldLevel = Character.level;
               Character.level = num;
               Character.proficiencyBonus = Math.floor((num - 1) / 4) + 2;
+              
+              // Обновляем кости хитов под новый уровень
+              Character.maxHitDice = num;
+              if (Character.hitDiceRemaining > num) Character.hitDiceRemaining = num;
+
+              if (num > oldLevel) {
+                // Предлагаем обновить здоровье варвара: 7 (d12 среднее) + CON за каждый новый уровень
+                const diff = num - oldLevel;
+                const hpGain = diff * (7 + Character.stats.con.mod);
+                Character.maxHp += hpGain;
+                Character.hp += hpGain;
+                showToast(`Уровень ${num}! Здоровье выросло на +${hpGain} HP`);
+              }
             }
             recalcStatsAndSkills();
             updateMetaDisplay();
@@ -3692,17 +3739,11 @@
     }
 
     function openCurrencyModal() {
-      const totalGp = Character.gold || 0;
-      let totalCp = Math.round(totalGp * 100);
+      if (!Character.coins) Character.coins = { gp: 0, sp: 3, cp: 7 };
 
-      const gp = Math.floor(totalCp / 100);
-      totalCp %= 100;
-      const sp = Math.floor(totalCp / 10);
-      const cp = totalCp % 10;
-
-      document.getElementById('coin-gp-input').value = gp;
-      document.getElementById('coin-sp-input').value = sp;
-      document.getElementById('coin-cp-input').value = cp;
+      document.getElementById('coin-gp-input').value = Character.coins.gp;
+      document.getElementById('coin-sp-input').value = Character.coins.sp;
+      document.getElementById('coin-cp-input').value = Character.coins.cp;
 
       updateCurrencyModalPreview();
       document.getElementById('currency-modal').classList.remove('hidden');
@@ -3712,51 +3753,75 @@
       document.getElementById('currency-modal').classList.add('hidden');
     }
 
-    function getEnteredCoinsInGp() {
+    function getEnteredCoinsInCp() {
       const gp = parseInt(document.getElementById('coin-gp-input').value) || 0;
       const sp = parseInt(document.getElementById('coin-sp-input').value) || 0;
       const cp = parseInt(document.getElementById('coin-cp-input').value) || 0;
-      return ((gp * 100) + (sp * 10) + cp) / 100;
+      return (gp * 100) + (sp * 10) + cp;
     }
 
     function updateCurrencyModalPreview() {
-      const currentGp = Character.gold || 0;
-      document.getElementById('curr-modal-total-gp').innerText = currentGp.toFixed(2);
-      document.getElementById('curr-modal-equiv-sp').innerText = (currentGp * 10).toFixed(1);
-      document.getElementById('curr-modal-equiv-cp').innerText = Math.round(currentGp * 100);
+      const totalGp = getTotalGoldValue();
+      const currentCp = (Character.coins.gp * 100) + (Character.coins.sp * 10) + Character.coins.cp;
 
-      const enteredGp = getEnteredCoinsInGp();
-      document.getElementById('curr-modal-calc-preview').innerText = `${enteredGp.toFixed(2)} зм (${(enteredGp * 10).toFixed(1)} см / ${Math.round(enteredGp * 100)} мм)`;
+      document.getElementById('curr-modal-total-gp').innerText = totalGp.toFixed(2);
+      document.getElementById('curr-modal-equiv-sp').innerText = (currentCp / 10).toFixed(1);
+      document.getElementById('curr-modal-equiv-cp').innerText = currentCp;
+
+      const enteredCp = getEnteredCoinsInCp();
+      const enteredGp = enteredCp / 100;
+      document.getElementById('curr-modal-calc-preview').innerText = `${enteredGp.toFixed(2)} зм (${(enteredCp / 10).toFixed(1)} см / ${enteredCp} мм)`;
     }
 
     function saveExactCoins() {
-      const newGp = getEnteredCoinsInGp();
-      Character.gold = parseFloat(newGp.toFixed(2));
+      const gp = Math.max(0, parseInt(document.getElementById('coin-gp-input').value) || 0);
+      const sp = Math.max(0, parseInt(document.getElementById('coin-sp-input').value) || 0);
+      const cp = Math.max(0, parseInt(document.getElementById('coin-cp-input').value) || 0);
+
+      Character.coins = { gp, sp, cp };
       recalcStatsAndSkills();
       closeCurrencyModal();
-      showToast(`Кошелек: ${Character.gold} зм`);
+      showToast(`Кошелек: ${getTotalGoldValue().toFixed(2)} зм`);
     }
 
     function addEnteredCoins() {
-      const addedGp = getEnteredCoinsInGp();
-      if (addedGp <= 0) return;
-      Character.gold = parseFloat(((Character.gold || 0) + addedGp).toFixed(2));
+      const addCp = getEnteredCoinsInCp();
+      if (addCp <= 0) return;
+
+      const currentCp = (Character.coins.gp * 100) + (Character.coins.sp * 10) + Character.coins.cp;
+      const newTotalCp = currentCp + addCp;
+
+      Character.coins = {
+        gp: Math.floor(newTotalCp / 100),
+        sp: Math.floor((newTotalCp % 100) / 10),
+        cp: newTotalCp % 10
+      };
+
       recalcStatsAndSkills();
       closeCurrencyModal();
-      showToast(`+${addedGp.toFixed(2)} зм!`);
+      showToast(`+${(addCp / 100).toFixed(2)} зм!`);
     }
 
     function spendEnteredCoins() {
-      const spentGp = getEnteredCoinsInGp();
-      if (spentGp <= 0) return;
-      if ((Character.gold || 0) < spentGp) {
-        showToast("Недостаточно средств!");
+      const spendCp = getEnteredCoinsInCp();
+      if (spendCp <= 0) return;
+
+      const currentCp = (Character.coins.gp * 100) + (Character.coins.sp * 10) + Character.coins.cp;
+      if (currentCp < spendCp) {
+        showToast("Недостаточно средств в кошельке!");
         return;
       }
-      Character.gold = parseFloat(((Character.gold || 0) - spentGp).toFixed(2));
+
+      const newTotalCp = currentCp - spendCp;
+      Character.coins = {
+        gp: Math.floor(newTotalCp / 100),
+        sp: Math.floor((newTotalCp % 100) / 10),
+        cp: newTotalCp % 10
+      };
+
       recalcStatsAndSkills();
       closeCurrencyModal();
-      showToast(`Потрачено ${spentGp.toFixed(2)} зм.`);
+      showToast(`Потрачено ${(spendCp / 100).toFixed(2)} зм.`);
     }
 
     function openAvatarModal() {
@@ -3772,9 +3837,7 @@
     function openLanguagesModal() {
       const modal = document.getElementById('languages-modal');
       const input = document.getElementById('languages-input');
-      if (input) {
-        input.value = Character.languages !== undefined ? Character.languages : "";
-      }
+      if (input) input.value = Character.languages !== undefined ? Character.languages : "";
       if (modal) modal.classList.remove('hidden');
       setTimeout(() => { if (input) input.focus(); }, 50);
     }
@@ -3808,12 +3871,6 @@
           saveCharacterData();
         }
       });
-    }
-
-    function saveNotesManual() {
-      const val = document.getElementById('player-notes').value;
-      localStorage.setItem('velvet_notes_v4', val);
-      showToast("Заметки сохранены!");
     }
 
     function openSheetManagerModal() {
@@ -3855,7 +3912,7 @@
             recalcStatsAndSkills();
             renderAll();
             closeSheetManagerModal();
-            showToast("Персонаж загружен!");
+            showToast("Персонаж успешно загружен!");
           }
         } catch (err) {
           showToast("Ошибка чтения JSON!");
@@ -3863,31 +3920,6 @@
         event.target.value = '';
       };
       reader.readAsText(file);
-    }
-
-    function copyCharacterJsonToClipboard() {
-      const textarea = document.getElementById('sheet-json-textarea');
-      if (!textarea) return;
-      textarea.select();
-      document.execCommand('copy');
-      showToast("Код скопирован в буфер!");
-    }
-
-    function applyCharacterJsonText() {
-      const textarea = document.getElementById('sheet-json-textarea');
-      if (!textarea) return;
-      try {
-        const parsed = JSON.parse(textarea.value.trim());
-        if (parsed && typeof parsed === 'object') {
-          Character = Object.assign({}, defaultCharacter, parsed);
-          recalcStatsAndSkills();
-          renderAll();
-          closeSheetManagerModal();
-          showToast("Персонаж обновлён!");
-        }
-      } catch (e) {
-        showToast("Синтаксическая ошибка в коде!");
-      }
     }
 
     function confirmResetDataDialog() {
@@ -3900,11 +3932,9 @@
     function executeConfirmedResetData() {
       closeResetConfirmModal();
       Character = JSON.parse(JSON.stringify(defaultCharacter));
-      Character.inventoryText = defaultCharacter.inventoryText;
       localStorage.removeItem(STORAGE_KEY);
       localStorage.removeItem('velvet_notes_v4');
       localStorage.removeItem('velvet_inventory_text_v4');
-      localStorage.removeItem('velvet_inventory_text_v5');
       recalcStatsAndSkills();
       renderAll();
       closeSheetManagerModal();
